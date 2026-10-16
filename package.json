@@ -1,0 +1,21 @@
+{
+  "name": "ekranlarimizin-ardinda-scrollytelling",
+  "version": "1.0.0",
+  "description": "Büyük Veri Analistliği - Teknoloji Kullanımı ve Dijital Alışkanlıklar Scrollytelling Web Sitesi",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "analyze": "python analyze.py"
+  },
+  "keywords": [
+    "scrollytelling",
+    "data-journalism",
+    "plotly",
+    "big-data",
+    "screen-time",
+    "user-behavior"
+  ],
+  "author": "Büyük Veri Analistliği",
+  "license": "MIT"
+}

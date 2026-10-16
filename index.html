@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ekranlarımızın Ardında — Teknoloji Kullanımı ve Dijital Alışkanlıklar</title>
+  <meta name="description" content="Büyük Veri Analistliği bölümü için 700 mobil cihaz kullanıcısının ekran süreleri, uygulama kullanımları ve dijital alışkanlıklarını inceleyen interaktif scrollytelling veri araştırması.">
+  <meta name="theme-color" content="#070a12">
+
+  <!-- Google Fonts: Outfit, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Plotly.js for Interactive Visualizations -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <!-- PapaParse for direct CSV loading fallback -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Reading Progress Indicator -->
+  <div id="reading-progress-container" aria-hidden="true">
+    <div id="reading-progress-bar"></div>
+  </div>
+
+  <!-- Sticky Top Navigation Bar -->
+  <header class="site-header" id="site-header">
+    <div class="header-container">
+      <a href="#section-hero" class="brand" id="brand-logo">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
+            <path d="M12 18h.01"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Ekranlarımızın Ardında</span>
+          <span class="brand-dept">Büyük Veri Analistliği • Veri Gazeteciliği</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="main-nav" aria-label="Bölüm Gezintisi">
+        <a href="#section-hero" class="nav-link active" data-section="section-hero">
+          <span class="nav-section-tag">00</span> Giriş
+        </a>
+        <a href="#section-screen-distribution" class="nav-link" data-section="section-screen-distribution">
+          <span class="nav-section-tag">01</span> Ekran Süresi
+        </a>
+        <a href="#section-app-screen-corr" class="nav-link" data-section="section-app-screen-corr">
+          <span class="nav-section-tag">02</span> Korelasyon
+        </a>
+        <a href="#section-demographics" class="nav-link" data-section="section-demographics">
+          <span class="nav-section-tag">03</span> Demografi
+        </a>
+        <a href="#section-consumption" class="nav-link" data-section="section-consumption">
+          <span class="nav-section-tag">04</span> Pil & Veri
+        </a>
+        <a href="#section-behavior-classes" class="nav-link" data-section="section-behavior-classes">
+          <span class="nav-section-tag">05</span> Davranış
+        </a>
+        <a href="#section-interactive-calc" class="nav-link" data-section="section-interactive-calc">
+          <span class="nav-section-tag">06</span> Hesaplayıcı
+        </a>
+        <a href="#section-conclusions" class="nav-link" data-section="section-conclusions">
+          <span class="nav-section-tag">07</span> Sonuç
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Error / Alert Banner (Hidden by default) -->
+  <div id="error-banner" role="alert" aria-live="assertive">
+    <span id="error-banner-text">Veri seti yüklenirken bir sorun oluştu.</span>
+  </div>
+
+  <main class="main-content" id="main-content">
+
+    <!-- ====================================================================
+         BÖLÜM 1: GİRİŞ — EKRANLARIMIZIN ARDINDA
+         ==================================================================== -->
+    <section class="hero-section story-section" id="section-hero">
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          BÜYÜK VERİ ANALİSTLİĞİ ARAŞTIRMA RAPORU
+        </div>
+
+        <h1 class="hero-title">
+          Ekranlarımızın <span class="gradient-text-purple">Ardında</span>
+        </h1>
+
+        <p class="hero-lead">
+          Telefonlarımızı nasıl kullanıyoruz ve dijital alışkanlıklarımız bize ne anlatıyor? 
+          700 gerçek katılımcının telemetri kayıtlarına dayanan, aşağı kaydırdıkça derinleşen bir veri hikâyesi.
+        </p>
+
+        <!-- 4 Key Statistics Cards -->
+        <div class="hero-stats-grid" id="hero-stats-grid">
+          <div class="stat-card" id="card-total-users">
+            <div class="stat-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="stat-value" id="val-total-users">700</div>
+            <div class="stat-label">Toplam Kullanıcı</div>
+            <div class="stat-desc">Analiz edilen doğrulanmış tekil örneklem boyutu</div>
+          </div>
+
+          <div class="stat-card" id="card-avg-screen">
+            <div class="stat-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="stat-value"><span id="val-avg-screen">5.27</span><span class="stat-unit">saat/gün</span></div>
+            <div class="stat-label">Ort. Günlük Ekran Süresi</div>
+            <div class="stat-desc">Katılımcıların ekranı açık tuttuğu ortalama süre</div>
+          </div>
+
+          <div class="stat-card" id="card-avg-app">
+            <div class="stat-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2"/>
+                <path d="M9 9h6v6H9z"/>
+              </svg>
+            </div>
+            <div class="stat-value"><span id="val-avg-app">271.1</span><span class="stat-unit">dk/gün</span></div>
+            <div class="stat-label">Ort. Uygulama Kullanımı</div>
+            <div class="stat-desc">Günlük yaklaşık 4 saat 31 dakika aktif etkileşim</div>
+          </div>
+
+          <div class="stat-card" id="card-avg-data">
+            <div class="stat-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                <path d="m15 5 3 3"/>
+              </svg>
+            </div>
+            <div class="stat-value"><span id="val-avg-data">929.6</span><span class="stat-unit">MB/gün</span></div>
+            <div class="stat-label">Ort. Günlük Veri Tüketimi</div>
+            <div class="stat-desc">Cihaz başına tüketilen ortalama mobil ve Wi-Fi verisi</div>
+          </div>
+        </div>
+
+        <a href="#section-screen-distribution" class="scroll-prompt" id="scroll-prompt-btn">
+          <div class="scroll-prompt-icon"></div>
+          <span>Aşağı Kaydır ve Hikâyeyi Keşfet</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         BÖLÜM 2: BİR GÜNÜMÜZ EKRANDA NE KADAR GEÇİYOR? (BOX PLOT)
+         ==================================================================== -->
+    <section class="story-section" id="section-screen-distribution">
+      <div class="section-badge">BÖLÜM 01 • SÜRE DAĞILIMI</div>
+      <h2 class="section-title">Bir Günümüz Ekranda <span class="gradient-text-cyan">Ne Kadar Geçiyor?</span></h2>
+      <p class="section-subtitle">
+        Kullanıcıların günlük ekran süreleri homojen bir çizgi mi izliyor, yoksa uçurumlar mı barındırıyor? 
+        700 katılımcının <code>Screen On Time (hours/day)</code> ölçümlerini interaktif kutu grafik ile inceliyoruz.
+      </p>
+
+      <div class="story-grid">
+        <!-- Sol: Editoryal Anlatı ve Bulgular -->
+        <div class="narrative-col">
+          <div class="editorial-card">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+              Dağılımın Merkez Noktası: Medyan Değeri
+            </h4>
+            <p>
+              Ortalama ekran süresi <strong>5.27 saat</strong> iken, aşırı uçların etkisinden arındırılmış <strong>ortanca (medyan) değer 4.90 saat</strong> seviyesindedir. 
+              Bu, incelenen 700 kişilik örneklemin tam yarısının günde 4.9 saatten az, diğer yarısının ise 4.9 saatten fazla ekran süresine sahip olduğunu kanıtlar.
+            </p>
+            <p>
+              Kullanıcıların yüzde 50'si <strong>2.50 saat (Q1)</strong> ile <strong>7.40 saat (Q3)</strong> aralığında toplanmaktadır. 
+              Çeyrekler arası açıklık (IQR) <strong>4.90 saat</strong> olarak hesaplanmıştır.
+            </p>
+
+            <div class="metrics-pill-list">
+              <div class="metric-pill-item">
+                <span class="metric-pill-label">Minimum Süre</span>
+                <span class="metric-pill-val">1.00 Saat</span>
+              </div>
+              <div class="metric-pill-item">
+                <span class="metric-pill-label">Birinci Çeyrek (Q1 - %25)</span>
+                <span class="metric-pill-val">2.50 Saat</span>
+              </div>
+              <div class="metric-pill-item cyan">
+                <span class="metric-pill-label">Ortanca / Medyan (Q2 - %50)</span>
+                <span class="metric-pill-val">4.90 Saat</span>
+              </div>
+              <div class="metric-pill-item">
+                <span class="metric-pill-label">Üçüncü Çeyrek (Q3 - %75)</span>
+                <span class="metric-pill-val">7.40 Saat</span>
+              </div>
+              <div class="metric-pill-item">
+                <span class="metric-pill-label">Maksimum Süre</span>
+                <span class="metric-pill-val">12.00 Saat</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="notice-box cyan">
+            <strong>Aykırı Değer (Outlier) Değerlendirmesi:</strong><br>
+            Tukey standart kuralına (1.5 × IQR) göre hesaplanan alt sınır (1.0h) ve üst sınır (12.0h) içerisinde kaldığından, veri setinde formel matematiksel aykırı değer bulunmamaktadır. Ekran süreleri 1 ile 12 saat arasına dengeli bir kademeyle yayılmıştır.
+          </div>
+        </div>
+
+        <!-- Sağ: İnteraktif Kutu Grafiği -->
+        <div class="graphic-col">
+          <div class="graphic-toolbar">
+            <div class="graphic-title-wrap">
+              <span class="graphic-title">Günlük Ekran Süresi Dağılımı (Kutu Grafik)</span>
+              <span class="graphic-caption">İnteraktif Box Plot & Bireysel Katılımcı Noktaları (Jitter)</span>
+            </div>
+            <div class="tab-group" id="boxplot-controls">
+              <button class="tab-btn active" id="btn-box-all" onclick="toggleBoxplotPoints('all')">Noktaları Göster</button>
+              <button class="tab-btn" id="btn-box-outliers" onclick="toggleBoxplotPoints('outliers')">Yalnızca Kutu</button>
+            </div>
+          </div>
+
+          <div class="chart-container" id="chart-screen-boxplot">
+            <!-- Plotly mounts here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         BÖLÜM 3: UYGULAMA KULLANIMI VE EKRAN SÜRESİ (SCATTER PLOT)
+         ==================================================================== -->
+    <section class="story-section" id="section-app-screen-corr">
+      <div class="section-badge">BÖLÜM 02 • DOĞRUSAL İLİŞKİ VE KORELASYON</div>
+      <h2 class="section-title">Uygulama Kullanımı ve <span class="gradient-text-purple">Ekran Süresi</span></h2>
+      <p class="section-subtitle">
+        Ekranı açık tutmak ile doğrudan uygulamalarla etkileşimde bulunmak arasındaki korelasyon ne kadar kuvvetli? 
+        <code>App Usage Time (min/day)</code> ile <code>Screen On Time (hours/day)</code> arasındaki matematiksel bağı çözümlüyoruz.
+      </p>
+
+      <div class="story-grid reversed">
+        <!-- Sol: İnteraktif Saçılım Grafiği -->
+        <div class="graphic-col">
+          <div class="graphic-toolbar">
+            <div class="graphic-title-wrap">
+              <span class="graphic-title">Uygulama Süresi vs. Ekran Süresi (Saçılım Grafiği)</span>
+              <span class="graphic-caption">700 Katılımcı • Pearson Korelasyonu ve OLS Doğrusal Regresyon Eğrisi</span>
+            </div>
+            <div class="tab-group" id="scatter-os-filter">
+              <button class="tab-btn active" onclick="filterScatterByOS('all')">Tümü (700)</button>
+              <button class="tab-btn" onclick="filterScatterByOS('Android')">Android (554)</button>
+              <button class="tab-btn" onclick="filterScatterByOS('iOS')">iOS (146)</button>
+            </div>
+          </div>
+
+          <div class="chart-container" id="chart-scatter-app-screen">
+            <!-- Plotly mounts here -->
+          </div>
+        </div>
+
+        <!-- Sağ: Editoryal Açıklama ve Korelasyon Bulguları -->
+        <div class="narrative-col">
+          <div class="editorial-card">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 14.14 14.14"/>
+              </svg>
+              İstatistiksel Güç: r = 0.9503
+            </h4>
+            <p>
+              İki değişken arasındaki Pearson korelasyon katsayısı <strong>r = 0.9503</strong> (p &lt; 0.001) olarak hesaplanmıştır. 
+              Belirlilik katsayısı olan <strong>R² = 0.9031</strong>, günlük ekran süresindeki varyasyonun %90.3'ünün doğrudan uygulama kullanım süresiyle açıklanabildiğini gösterir.
+            </p>
+            <p>
+              Hesaplanan en küçük kareler (OLS) regresyon denklemi:<br>
+              <code style="display:inline-block; margin-top:0.35rem; padding:0.25rem 0.5rem; background:rgba(0,0,0,0.4); border-radius:4px; font-family:var(--font-mono); color:var(--accent-cyan);">y = 0.0165x + 0.8107</code>
+            </p>
+            <p>
+              Bu formül, her ilave <strong>60 dakikalık (1 saatlik)</strong> uygulama kullanımının, toplam ekran süresine ortalama <strong>0.99 saat (yaklaşık 1 saat)</strong> olarak yansıdığını doğrulamaktadır.
+            </p>
+          </div>
+
+          <div class="notice-box amber">
+            <strong>Önemli Metodolojik Uyarı:</strong><br>
+            <strong>1. Korelasyon Nedensellik Değildir:</strong> Yüksek doğrusal uyum, her iki metriğin aynı temel dijital etkileşim dinamiklerinin birer yansıması olduğunu gösterir, ancak tek başına sebep-sonuç bağını ispatlamaz.<br>
+            <strong>2. Platform Kırılımı Yoktur:</strong> Veri setinde Instagram, TikTok, YouTube veya WhatsApp gibi tekil uygulama isimleri bulunmamaktadır; analiz toplam günlük uygulama süresini kapsamaktadır.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         BÖLÜM 4: YAŞ VE CİNSİYETE GÖRE DİJİTAL ALIŞKANLIKLAR (BAR CHART)
+         ==================================================================== -->
+    <section class="story-section" id="section-demographics">
+      <div class="section-badge">BÖLÜM 03 • DEMOGRAFİK ÇÖZÜMLEME</div>
+      <h2 class="section-title">Yaş ve Cinsiyete Göre <span class="gradient-text-cyan">Dijital Alışkanlıklar</span></h2>
+      <p class="section-subtitle">
+        Toplumdaki yaygın kanı, gençlerin telefon başında katbekat fazla vakit geçirdiği yönündedir. 
+        Peki veri setindeki <code>Age</code> ve <code>Gender</code> değişkenleri bize ne anlatıyor?
+      </p>
+
+      <div class="story-grid">
+        <!-- Sol: Editoryal Anlatı -->
+        <div class="narrative-col">
+          <div class="editorial-card">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              Şaşırtıcı Bulgusu: Kuşaklararası Eşitlik
+            </h4>
+            <p>
+              Veriler incelendiğinde yaş grupları arasında ekran süresi bakımından varsayılan dramatik uçurum <strong>gözlemlenmemektedir</strong>:
+            </p>
+            <ul style="padding-left:1.25rem; font-size:0.88rem; color:var(--text-secondary); margin-bottom:1rem; line-height:1.7;">
+              <li><strong>18–29 Yaş (n=192):</strong> 5.19 saat/gün ortalama</li>
+              <li><strong>30–39 Yaş (n=164):</strong> 5.28 saat/gün ortalama</li>
+              <li><strong>40–49 Yaş (n=159):</strong> 5.27 saat/gün ortalama</li>
+              <li><strong>50–59 Yaş (n=174):</strong> 5.35 saat/gün ortalama</li>
+            </ul>
+            <p>
+              Cinsiyet kırılımında ise <strong>Kadınlar (n=336) 5.26 saat</strong>, <strong>Erkekler (n=364) 5.28 saat</strong> ortalama ekran süresine sahiptir. İki grup arasındaki fark yalnızca 0.02 saat (yaklaşık 1.2 dakika) olup istatistiksel açıdan farksızdır.
+            </p>
+          </div>
+
+          <div class="notice-box">
+            <strong>Analitik Değerlendirme:</strong><br>
+            Modern iş hayatı, uzaktan çalışma, dijital bankacılık ve anlık iletişim kanalları sebebiyle akıllı telefon bağımlılığı veya yoğunluğu yaş ya da cinsiyet ayırt etmeksizin tüm yetişkin demografik katmanlara benzer oranlarda yerleşmiştir.
+          </div>
+        </div>
+
+        <!-- Sağ: Gruplanmış Çubuk Grafik -->
+        <div class="graphic-col">
+          <div class="graphic-toolbar">
+            <div class="graphic-title-wrap">
+              <span class="graphic-title">Demografik Gruplarda Ekran Süresi Karşılaştırması</span>
+              <span class="graphic-caption">Grup Başına Örneklem Sayısı (n) ve Ortalama Saat</span>
+            </div>
+            <div class="tab-group" id="demo-controls">
+              <button class="tab-btn active" id="btn-demo-age" onclick="updateDemographicsView('age')">Yaş Grupları</button>
+              <button class="tab-btn" id="btn-demo-gender" onclick="updateDemographicsView('gender')">Cinsiyet</button>
+              <button class="tab-btn" id="btn-demo-cross" onclick="updateDemographicsView('cross')">Yaş & Cinsiyet Çapraz</button>
+            </div>
+          </div>
+
+          <div class="chart-container" id="chart-demographics">
+            <!-- Plotly mounts here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         BÖLÜM 5: DAHA FAZLA KULLANIM, DAHA FAZLA PİL TÜKETİMİ Mİ?
+         ==================================================================== -->
+    <section class="story-section" id="section-consumption">
+      <div class="section-badge">BÖLÜM 04 • DONANIM VE TÜKETİM DİNAMİKLERİ</div>
+      <h2 class="section-title">Daha Fazla Kullanım, <span class="gradient-text-purple">Daha Fazla Tüketim mi?</span></h2>
+      <p class="section-subtitle">
+        Uygulama kullanım süresi cihazın donanımını ve internet kotasını nasıl etkiliyor? 
+        <code>Battery Drain (mAh/day)</code> ve <code>Data Usage (MB/day)</code> ilişkilerini mercek altına alıyoruz.
+      </p>
+
+      <div class="story-grid reversed">
+        <!-- Sol: Donanım Tüketim Grafiği -->
+        <div class="graphic-col">
+          <div class="graphic-toolbar">
+            <div class="graphic-title-wrap">
+              <span class="graphic-title">Kullanım Süresi ile Pil ve Veri Tüketimi İlişkisi</span>
+              <span class="graphic-caption">Yüksek Güç Tüketimi Dinamikleri</span>
+            </div>
+            <div class="tab-group" id="consumption-controls">
+              <button class="tab-btn active" id="btn-cons-battery" onclick="updateConsumptionView('battery')">Pil Tüketimi (mAh)</button>
+              <button class="tab-btn" id="btn-cons-data" onclick="updateConsumptionView('data')">Veri Kullanımı (MB)</button>
+              <button class="tab-btn" id="btn-cons-dual" onclick="updateConsumptionView('dual')">Karşılaştırmalı Görünüm</button>
+            </div>
+          </div>
+
+          <div class="chart-container" id="chart-consumption">
+            <!-- Plotly mounts here -->
+          </div>
+        </div>
+
+        <!-- Sağ: Editoryal Yorum -->
+        <div class="narrative-col">
+          <div class="editorial-card">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" y1="11" x2="22" y2="13"/>
+              </svg>
+              Donanım Maliyeti: Pil & Veri İlişkisi
+            </h4>
+            <p>
+              Uygulama kullanım süresi ile pil tüketimi arasında <strong>r = 0.9564</strong> düzeyinde son derece güçlü pozitif korelasyon bulunmaktadır. 
+              Ortalama bir kullanıcı günde <strong>1525 mAh</strong> pil harcarken, yoğun kullanıcı grubunda bu rakam <strong>2700 mAh</strong> sınırını aşmaktadır.
+            </p>
+            <p>
+              İnternet veri kullanımında da benzer bir senaryo mevcuttur: 
+              Uygulama süresi ile veri tüketimi arasındaki korelasyon <strong>r = 0.9423</strong>'tür. 
+              Hafif kullanıcılar günde ortalama <strong>202 MB</strong> tüketirken, yoğun kullanıcılar <strong>1975 MB (~2 GB)</strong> seviyesine ulaşmaktadır.
+            </p>
+
+            <div class="metrics-pill-list">
+              <div class="metric-pill-item">
+                <span class="metric-pill-label">Uygulama vs. Pil Korelasyonu</span>
+                <span class="metric-pill-val">r = 0.9564</span>
+              </div>
+              <div class="metric-pill-item cyan">
+                <span class="metric-pill-label">Uygulama vs. Veri Korelasyonu</span>
+                <span class="metric-pill-val">r = 0.9423</span>
+              </div>
+              <div class="metric-pill-item emerald">
+                <span class="metric-pill-label">Ekran Süresi vs. Pil Korelasyonu</span>
+                <span class="metric-pill-val">r = 0.9490</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="notice-box">
+            <strong>Bulgu Özeti:</strong> Telefon kullanımının artması sadece zaman kaybı yaratmamakta; cihazın batarya döngüsünü 2 ila 3 kat daha hızlı tüketmekte ve veri transfer ihtiyacını katlamaktadır.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         BÖLÜM 6: KULLANICI DAVRANIŞ SINIFLARI (USER BEHAVIOR CLASS)
+         ==================================================================== -->
+    <section class="story-section" id="section-behavior-classes">
+      <div class="section-badge">BÖLÜM 05 • DAVRANIŞ SEGMENTASYONU</div>
+      <h2 class="section-title">Kullanıcı <span class="gradient-text-cyan">Davranış Sınıfları</span></h2>
+      <p class="section-subtitle">
+        Veri setindeki <code>User Behavior Class</code> değişkeni kullanıcıları 1'den 5'e kadar sınıflandırmaktadır. 
+        Her bir sınıfın katılımcı sayısını ve ekran süresi dağılımını inceliyoruz.
+      </p>
+
+      <div class="story-grid">
+        <!-- Sol: Editoryal Kart ve Sınıf Özeti -->
+        <div class="narrative-col">
+          <div class="editorial-card">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+              5 Ayrı Dijital Profil
+            </h4>
+            <p>
+              Veri setinde 700 kullanıcı 5 sınıfa neredeyse eşit oranlarda (%19.4 - %20.9) dağıtılmıştır:
+            </p>
+            <div class="metrics-pill-list">
+              <div class="metric-pill-item">
+                <span class="metric-pill-label">Sınıf 1 (n=136): Minimalist Kullanım</span>
+                <span class="metric-pill-val">Ort. 1.49 Saat</span>
+              </div>
+              <div class="metric-pill-item">
+                <span class="metric-pill-label">Sınıf 2 (n=146): Temel / Düşük Kullanım</span>
+                <span class="metric-pill-val">Ort. 3.04 Saat</span>
+              </div>
+              <div class="metric-pill-item cyan">
+                <span class="metric-pill-label">Sınıf 3 (n=143): Dengeli / Orta Kullanım</span>
+                <span class="metric-pill-val">Ort. 4.96 Saat</span>
+              </div>
+              <div class="metric-pill-item">
+                <span class="metric-pill-label">Sınıf 4 (n=139): Yoğun Kullanım</span>
+                <span class="metric-pill-val">Ort. 6.91 Saat</span>
+              </div>
+              <div class="metric-pill-item emerald">
+                <span class="metric-pill-label">Sınıf 5 (n=136): Aşırı Yoğun (Power User)</span>
+                <span class="metric-pill-val">Ort. 10.11 Saat</span>
+              </div>
+            </div>
+            <p style="margin-top:1rem; font-size:0.86rem; color:var(--text-muted);">
+              *Sınıf tanımları veri setindeki nicel metriklerle birebir örtüşen empirik segmentlerdir.
+            </p>
+          </div>
+
+          <div class="notice-box cyan">
+            <strong>Kutu Grafik Karşılaştırması:</strong><br>
+            Sınıflar arasındaki ekran süresi basamakları net sınırlarla ayrışmaktadır. Sınıf 1'in tavanı 2 saat iken, Sınıf 5'te ekran süreleri 12 saate kadar uzanmaktadır.
+          </div>
+        </div>
+
+        <!-- Sağ: Çubuk ve Kutu Grafik -->
+        <div class="graphic-col">
+          <div class="graphic-toolbar">
+            <div class="graphic-title-wrap">
+              <span class="graphic-title">Davranış Sınıfları Analizi</span>
+              <span class="graphic-caption">Kullanıcı Sayısı ve Sınıf Başına Ekran Süresi Kutu Dağılımı</span>
+            </div>
+            <div class="tab-group" id="class-controls">
+              <button class="tab-btn active" id="btn-class-box" onclick="updateClassView('box')">Ekran Süresi Kutu Dağılımı</button>
+              <button class="tab-btn" id="btn-class-bar" onclick="updateClassView('bar')">Kullanıcı Dağılımı (Kişi)</button>
+            </div>
+          </div>
+
+          <div class="chart-container" id="chart-classes-display">
+            <!-- Plotly mounts here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         BÖLÜM 7: SEN BU DAĞILIMIN NERESİNDESİN? (INTERACTIVE SLIDER SECTION)
+         ==================================================================== -->
+    <section class="story-section" id="section-interactive-calc">
+      <div class="section-badge">BÖLÜM 06 • ETKİLEŞİMLİ DENEYİM</div>
+      <h2 class="section-title">Peki, Senin Ekran Süren <span class="gradient-text-purple">Ne Kadar?</span></h2>
+      <p class="section-subtitle">
+        Günlük ortalama ekran süreni kaydır; gerçek veri setindeki 700 katılımcının dağılımında tam olarak nerede durduğunu ve yüzdelik dilimini anında keşfet.
+      </p>
+
+      <div class="interactive-calc-wrapper">
+        <div class="calc-grid">
+          <!-- Sol Kontrol Alanı -->
+          <div class="slider-control-card">
+            <div class="slider-val-display">
+              <div>
+                <span class="slider-big-val" id="display-slider-val">5.0</span>
+                <span class="slider-val-unit">Saat / Gün</span>
+              </div>
+              <div class="slider-min-display" id="display-slider-minutes">
+                300 Dakika
+              </div>
+            </div>
+
+            <!-- Range Slider -->
+            <div class="range-slider-wrap">
+              <label for="screen-time-slider" style="font-size:0.82rem; color:var(--text-secondary); font-weight:600;">
+                GÜNLÜK EKRAN SÜRENİZİ BELİRLEYİN:
+              </label>
+              <input 
+                type="range" 
+                id="screen-time-slider" 
+                class="custom-range-slider" 
+                min="0.0" 
+                max="12.0" 
+                step="0.1" 
+                value="5.0"
+                aria-label="Günlük ekran süresi saat slider"
+              >
+              <div class="slider-ticks">
+                <span>0.0 Saat (Min)</span>
+                <span>4.9 Saat (Medyan)</span>
+                <span>12.0 Saat (Maks)</span>
+              </div>
+            </div>
+
+            <!-- Dynamic Percentile Card -->
+            <div class="percentile-badge-card" id="percentile-badge-card">
+              <div class="percentile-header">
+                <span class="percentile-tag">GERÇEK VERİ YÜZDELİK DİLİMİ (PERCENTILE)</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/>
+                </svg>
+              </div>
+              <div>
+                <span class="percentile-num" id="display-percentile-num">51.7</span>
+                <span class="percentile-num-pct">%</span>
+              </div>
+              <p class="percentile-explanation" id="display-percentile-text">
+                Veri setindeki kullanıcıların <strong>%51.7'sinden</strong> daha az veya eşit ekran süresine sahipsiniz.
+              </p>
+              <span class="percentile-subtext" id="display-percentile-subtext">
+                Örneklemdeki 700 kişinin 362'sinden daha az ekran süreniz var.
+              </span>
+            </div>
+
+            <!-- Benchmarks -->
+            <div class="benchmark-row">
+              <div class="benchmark-box">
+                <div class="benchmark-box-label">Veri Seti Min</div>
+                <div class="benchmark-box-val">1.0 Saat</div>
+              </div>
+              <div class="benchmark-box">
+                <div class="benchmark-box-label">Veri Seti Medyan</div>
+                <div class="benchmark-box-val">4.9 Saat</div>
+              </div>
+              <div class="benchmark-box">
+                <div class="benchmark-box-label">Veri Seti Maks</div>
+                <div class="benchmark-box-val">12.0 Saat</div>
+              </div>
+            </div>
+
+            <div class="notice-box amber" style="margin-top:0.25rem;">
+              <strong>Sorumluluk Reddi ve Teşhis Uyarısı:</strong><br>
+              Bu interaktif araç tıbbi veya psikolojik bir bağımlılık teşhisi yapmaz. Yalnızca 700 katılımcılık veri setindeki göreceli konumunuzu nesnel yüzdelik dilim formülüyle <code>((≤ Süre Kullanıcı Sayısı) / 700) × 100</code> gösterir.
+            </div>
+          </div>
+
+          <!-- Sağ: Dağılım Eğrisi ve Kullanıcının Konumu Grafiği -->
+          <div class="graphic-col" style="background:rgba(8,12,22,0.7);">
+            <div class="graphic-toolbar">
+              <div class="graphic-title-wrap">
+                <span class="graphic-title">700 Kullanıcılık Frekans Dağılımı ve Konumunuz</span>
+                <span class="graphic-caption">Kırmızı dikey çizgi seçtiğiniz ekran süresini temsil eder</span>
+              </div>
+            </div>
+
+            <div class="chart-container" id="chart-user-percentile">
+              <!-- Plotly mounts here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         BÖLÜM 8: SONUÇ, SINIRLILIKLAR VE KAYNAKÇA
+         ==================================================================== -->
+    <section class="story-section" id="section-conclusions">
+      <div class="section-badge">BÖLÜM 07 • BÜYÜK RESİM</div>
+      <h2 class="section-title">Sonuç ve <span class="gradient-text-cyan">Değerlendirme</span></h2>
+      <p class="section-subtitle">
+        Büyük Veri Analistliği çalışması kapsamında gerçekleştirilen veri madenciliği ve görselleştirme adımlarından çıkan 5 temel editoryal sonuç.
+      </p>
+
+      <!-- 5 Temel Sonuç Kartı -->
+      <div class="conclusions-grid">
+        <div class="conclusion-card">
+          <span class="conclusion-num">BULGU 01</span>
+          <h3 class="conclusion-title">Geniş ve Kademeli Süre Spektrumu</h3>
+          <p class="conclusion-desc">
+            Günlük ekran süreleri 1.0 saat ile 12.0 saat arasında geniş bir banda yayılmıştır. Katılımcıların yarısı günde 4.9 saatten fazla ekran başındadır.
+          </p>
+        </div>
+
+        <div class="conclusion-card">
+          <span class="conclusion-num">BULGU 02</span>
+          <h3 class="conclusion-title">Kuvvetli Doğrusal Eşzamanlılık</h3>
+          <p class="conclusion-desc">
+            Uygulama kullanım süresi ile ekran süresi arasında r = 0.9503 korelasyon bulunmuştur. Ekranın açık kaldığı her an aktif uygulama etkileşimine karşılık gelmektedir.
+          </p>
+        </div>
+
+        <div class="conclusion-card">
+          <span class="conclusion-num">BULGU 03</span>
+          <h3 class="conclusion-title">Demografik Homojenlik</h3>
+          <p class="conclusion-desc">
+            Popüler varsayımların aksine, 18-29 yaş grubu (5.19h) ile 50-59 yaş grubu (5.35h) arasında ve kadınlar (5.26h) ile erkekler (5.28h) arasında anlamlı bir süre farkı bulunmamaktadır.
+          </p>
+        </div>
+
+        <div class="conclusion-card">
+          <span class="conclusion-num">BULGU 04</span>
+          <h3 class="conclusion-title">Fiziksel Tüketim Maliyeti</h3>
+          <p class="conclusion-desc">
+            Yüksek ekran süresi doğrudan yüksek pil deşarjı (r = 0.9564) ve katlanan veri trafiği (r = 0.9423) doğurmaktadır. Cihaz donanımı yoğun kullanımla orantılı yıpranmaktadır.
+          </p>
+        </div>
+
+        <div class="conclusion-card">
+          <span class="conclusion-num">BULGU 05</span>
+          <h3 class="conclusion-title">Dengeli 5 Davranış Segmenti</h3>
+          <p class="conclusion-desc">
+            Kullanıcı davranış sınıfları (1'den 5'e) örneklemde ~%20'lik eşit bloklar halinde gruplanmıştır; minimalistlerden 10+ saatlik power user'lara kadar kademeli bir piramit mevcuttur.
+          </p>
+        </div>
+
+        <div class="conclusion-card" style="border-color:var(--border-cyan);">
+          <span class="conclusion-num" style="background:rgba(6,182,212,0.15); color:var(--accent-cyan);">BULGU 06</span>
+          <h3 class="conclusion-title">Dijital Alışkanlıkların Dönüşümü</h3>
+          <p class="conclusion-desc">
+            Akıllı telefonlar yalnızca bir iletişim aracı değil; iş, eğlence, bilgi ve sosyal etkileşimin birincil merkezi haline gelerek günlük hayatın en az çeyreğini işgal etmektedir.
+          </p>
+        </div>
+      </div>
+
+      <!-- Sınırlılıklar (Limitations) -->
+      <div class="limitations-wrapper">
+        <h3>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Araştırmanın ve Veri Setinin Sınırlılıkları (Methodological Limitations)
+        </h3>
+        <div class="limitations-list">
+          <div class="limitation-item">
+            <strong>Zaman Serisi Eksikliği</strong>
+            Veri seti kesitsel (cross-sectional) niteliktedir; yıllara veya aylara göre değişim içermez. Bu sebeple "ekran süreleri yıllar içinde artıyor/azalıyor" gibi çıkarımlar yapılamaz.
+          </div>
+          <div class="limitation-item">
+            <strong>Uygulama İsimlerinin Bulunmaması</strong>
+            Kayıtlar yalnızca kümülatif dakika cinsinden uygulama süresi tutar; Instagram, TikTok, YouTube veya Netflix gibi özel platformların payı bu veri setiyle ölçülemez.
+          </div>
+          <div class="limitation-item">
+            <strong>Klinik Teşhis Niteliği Taşımaması</strong>
+            Yüksek ekran süresi doğrudan psikolojik bağımlılık veya patolojik bir durum anlamına gelmez; mesleki kullanım veya zorunlu iş süreçleri de bu süreleri doğurabilmektedir.
+          </div>
+        </div>
+      </div>
+
+      <!-- Kaynakça ve Künye -->
+      <div class="bibliography-wrapper">
+        <h4>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+            <path d="M6 6h10M6 10h10M6 14h6"/>
+          </svg>
+          Kaynakça, Metodoloji ve Proje Künyesi
+        </h4>
+        <div class="biblio-list">
+          <div class="biblio-item">
+            <span class="biblio-tag">VERİ SETİ</span>
+            <span><code>user_behavior_dataset.csv</code> — 700 doğrulanmış mobil telemetri kaydı (User ID, Device Model, OS, App Usage, Screen On Time, Battery Drain, Apps, Data Usage, Age, Gender, User Behavior Class).</span>
+          </div>
+          <div class="biblio-item">
+            <span class="biblio-tag">ANALİZ ARACI</span>
+            <span>Python 3.13 &amp; Pandas 2.3 — Veri temizleme, özet istatistikler, korelasyon matrisi ve Tukey kutu grafik hesaplamaları.</span>
+          </div>
+          <div class="biblio-item">
+            <span class="biblio-tag">GÖRSELLEŞTİRME</span>
+            <span>Plotly.js v2.35.2 &amp; Vanilla JavaScript — Özel koyu editoryal tema, reaktif grafikler, OLS regresyon eğrileri ve duyarlı kutu grafikleri.</span>
+          </div>
+          <div class="biblio-item">
+            <span class="biblio-tag">AKADEMİK BÖLÜM</span>
+            <span>Büyük Veri Analistliği Bölümü • Veri Gazeteciliği ve Etkileşimli Scrollytelling Tasarımı.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-dept-badge">Büyük Veri Analistliği • Scrollytelling Projesi</div>
+      <p>Ekranlarımızın Ardında © 2026 — Tüm istatistikler ve analizler gerçek veri setinden hesaplanmıştır.</p>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
